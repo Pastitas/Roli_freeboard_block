@@ -65,12 +65,12 @@ const int purple = 0xffff00ff;
 
 //Default values for 5D
 
-const int defaultVel = 49;
+const int defaultVel = 37;
 const int defaultLift = 127;
 
-const int defaultGlide = 0;
-const int defaultSlide = 0;
-const int defaultPress = 0;
+const int defaultGlide = 120;
+const int defaultSlide = 62;
+const int defaultPress = 87;
 
 int  presetIndex;
 int  topOctaveShift;
@@ -112,6 +112,7 @@ void initialise()
     clusterWidthLast = 1;
     updateTopologyShift();
     settingsRequested = false;
+    syncAllBlocks();
 }
 
 void sendConfigItemToCluster (int itemId)
@@ -263,6 +264,22 @@ void touchStart (int index, float x, float y, float z, float vz)
            }
            else if (x >= CSharp && x < DSharp)
            {
+               log(getLocalConfig(14));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    setLocalConfig(14, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(14, defaultLift);
+                }
+               
+           }
+           else if (x >= DSharp && x < FSharp)
+           {
                log(getLocalConfig(11));
                log(yi);
                if (y > topRow)
@@ -273,11 +290,11 @@ void touchStart (int index, float x, float y, float z, float vz)
                 }
                else if (y >= 0.0 && y < topRow)
                 {
-                    setLocalConfig(11, defaultLift);
+                    setLocalConfig(11, defaultGlide);
                 }
                
            }
-           else if (x >= DSharp && x < FSharp)
+           else if (x >= FSharp && x < GSharp)
            {
                log(getLocalConfig(12));
                log(yi);
@@ -289,12 +306,11 @@ void touchStart (int index, float x, float y, float z, float vz)
                 }
                else if (y >= 0.0 && y < topRow)
                 {
-                    setLocalConfig(12, defaultGlide);
+                    setLocalConfig(12, defaultSlide);
                 }
                
            }
-           else if (x >= FSharp && x < GSharp)
-           {
+           else if (x >= GSharp && x < ASharp){
                log(getLocalConfig(13));
                log(yi);
                if (y > topRow)
@@ -305,22 +321,7 @@ void touchStart (int index, float x, float y, float z, float vz)
                 }
                else if (y >= 0.0 && y < topRow)
                 {
-                    setLocalConfig(13, defaultSlide);
-                }
-               
-           }
-           else if (x >= GSharp && x < ASharp){
-               log(getLocalConfig(14));
-               log(yi);
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
-                    //setLocalConfig(14, value);
-                }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(14, defaultPress);
+                    setLocalConfig(13, defaultPress);
                 }
                
            }
@@ -351,6 +352,7 @@ void handleButtonDown (int index)
         // when mode button is pressed, enable function layer globally
         setLocalConfig(64,1);
         sendConfigItemToCluster(64);
+        sendMIDI(0x7B);
     }
 }
 
