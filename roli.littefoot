@@ -72,11 +72,14 @@ const int defaultGlide = 120;
 const int defaultSlide = 62;
 const int defaultPress = 87;
 
+int  xPos;
 int  presetIndex;
 int  topOctaveShift;
 int  clusterWidthLast;
-int  xPos;
 bool settingsRequested;
+
+// Config settings to sync
+
 
 void initialise()
 {
@@ -112,7 +115,6 @@ void initialise()
     clusterWidthLast = 1;
     updateTopologyShift();
     settingsRequested = false;
-    syncAllBlocks();
 }
 
 void sendConfigItemToCluster (int itemId)
@@ -148,7 +150,6 @@ void updateTopologyShift ()
 				sendConfigItemToCluster (4);
 			}
 		}
-		
 		xPos = getClusterXpos();
     }
     else if (topOctaveShift != 0)
@@ -161,33 +162,23 @@ void updateTopologyShift ()
 void repaint()
 {
     updateTopologyShift();
-    syncAllBlocks();
+    clearDisplay();
     
     if (! getBlockIDOnPort(0)) // if leftmost block light up key
     {
         if (getLocalConfig(2) == 1) //if MPE mode
         {
-            clearDisplay();
-            fillPixel (teal, 0, 0);
-            fillPixel (teal, 1, 0); 
+            fillPixel(teal, 0, 0);
+            fillPixel(teal, 1, 0);
+            
         }
         else if (getLocalConfig(17)== 1) // If Piano mode show Yellow
         {
-            clearDisplay();
-            fillPixel (yellow, 0, 0);
-            fillPixel (yellow, 1, 0);
+            fillPixel(yellow, 0, 0);
+            fillPixel(yellow, 1, 0);
         }
     }
-    else //if not the leftmost block do not light up controll key
-    {
-        fillPixel (0, 0, 0);
-        fillPixel (0, 1, 0);
-    }
     
-    if (!settingsRequested && isConnectedToHost()) {
-        sendCC(0, 61, 100);
-        settingsRequested = true;
-    }
 }
 
 void touchStart (int index, float x, float y, float z, float vz)
@@ -402,7 +393,6 @@ void enablePianoMode(bool enable) {
 void syncAllBlocks() {
     
     // Updates every value except octave and some not set
-    
     sendConfigItemToCluster (0);
     sendConfigItemToCluster (1);
     sendConfigItemToCluster (2);
@@ -420,8 +410,28 @@ void syncAllBlocks() {
     sendConfigItemToCluster (18);
     sendConfigItemToCluster (30);
     sendConfigItemToCluster (31);
-    sendConfigItemToCluster (32);
+    sendConfigItemToCluster (32); 
+}
+void syncBlockToMaster()
+{
+    if (getClusterWidth() < 2)
+        return;
+    
+    int numBlocksInCluster = getNumBlocksInCurrentCluster();
+    if (isMasterBlock())
+    {
+        syncAllBlocks();
+    }     
+    else if (isMasterInCurrentCluster())
+    {
+        int port = getPortToMaster();
+        if (port != 0xff)
+        {
+            setLocalConfig( 0,int (requestRemoteConfig(getBlockIDOnPort(port), 0)));
+        }
 
+        
+    }
 }
 
 void handleMIDI(int byte0, int byte1, int byte2) {
