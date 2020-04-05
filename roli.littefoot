@@ -11,12 +11,6 @@
  
  config 64 used as shift button indicator
  
- C:
- 
- 
- 
- 
-*/
 
 /*
 If pressing mode button, octave down enables "normal" midi operation, channel set by key before letting go of shift
