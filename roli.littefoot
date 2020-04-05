@@ -163,7 +163,6 @@ void updateTopologyShift ()
 void repaint()
 {
     updateTopologyShift();
-    syncBlockToMaster();
     clearDisplay();
     
     if (! getBlockIDOnPort(0)) // if leftmost block light up key
@@ -189,10 +188,8 @@ void touchStart (int index, float x, float y, float z, float vz)
     int yi = int (y * 100);
     //log(xi);
     //log(yi);
-    log(getBlockIdForBlockInCluster(0));
-    log(getBlockIdForBlockInCluster(1));
-
-    
+    //log(getBlockIdForBlockInCluster(0));
+    //log(getBlockIdForBlockInCluster(1));
     
     // Handle octave switches
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
@@ -220,6 +217,7 @@ void touchStart (int index, float x, float y, float z, float vz)
         {
             enablePianoMode(false);
             setChannelMode(0);
+            syncAllBlocks();
         }
          else if (getClusterWidth() > 1 && getClusterXpos() < getNumBlocksInCurrentCluster() - 1)
         {
@@ -349,6 +347,7 @@ void handleButtonDown (int index)
         // when mode button is pressed, enable function layer globally
         setLocalConfig(64,1);
         sendConfigItemToCluster(64);
+        syncBlockToMaster();
         sendMIDI(0x7B);
         sendMIDI(0x78);
     }
