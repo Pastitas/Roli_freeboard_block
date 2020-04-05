@@ -1,29 +1,24 @@
 /*
 <metadata description="Seaboard Block script for standalone config changes" target="Seaboard" tags="Default;MPE;MIDI;Melodic">
     <groups>
-        <group name="colour" displayName="Colour"   />
     </groups>
     <variables>
-        <variable group="colour" name="alpha"  type="float" min="0" max="255" value="255" />
-        <variable group="colour" name="red"    type="int"   min="0" max="255" value="0" />
-        <variable group="colour" name="green"  type="int"   min="0" max="255" value="255"   />
-        <variable group="colour" name="blue"   type="int"   min="0" max="255" value="255"   />
         <variable name="draw"    type="bool"   value="true" />
     </variables>
 </metadata>
 
 */
 /* DOCS
- Max X value(right): 58
+ Max X value(right): 58/10
  Max Z value(down): 30/10
  
- Config item max: 95, 37 and up are user values
+ Config item max: 95, 64 and up are user values
  
- config 64 used as shift button indicator
+ config 64 used as function layer (mode button pressed) indicator
  
 
 /*
-If pressing mode button, octave down enables "normal" midi operation, channel set by key before letting go of shift
+If pressing mode button, octave down enables "normal" midi operation, channel set by key before letting go of mode key (function key)
 and octave up enables MPE mode
  
 All changes in config sync between all blocks in the chain
@@ -42,7 +37,13 @@ const float octaveUpYloc = 0.0;
 const float octaveSwitchXSize = 0.3;
 const float octaveSwitchYSize = 0.2;
 
+// Max Y value for top row, min for bottom (grows from right left corner 0,0)
+
+const float topRow = 0.39;
+const float botRow = 2.46;
+
 // upper X limits for key mapping THEY DO OVERLAP, SHARPS TO BE USED ONLY WITH EACH OTHER
+
 const float C = 0.38;
 const float CSharp = 0.59;
 const float D = 0.81;
@@ -55,9 +56,21 @@ const float GSharp = 2.39;
 const float A = 2.56;
 const float ASharp = 2.96;
 
-int teal;
-int yellow;
-int purple;
+// Colours for mode button
+
+const int blue = 0xff0000ff;
+const int teal = 0xff00ffff;
+const int yellow = 0xffffff00;
+const int purple = 0xffff00ff;
+
+//Default values for 5D
+
+const int defaultVel = 49;
+const int defaultLift = 127;
+
+const int defaultGlide = 0;
+const int defaultSlide = 0;
+const int defaultPress = 0;
 
 int  presetIndex;
 int  topOctaveShift;
@@ -99,10 +112,6 @@ void initialise()
     clusterWidthLast = 1;
     updateTopologyShift();
     settingsRequested = false;
-    
-    teal = makeARGB (255, 0, 255, 255);
-    yellow = makeARGB (255, 255, 255, 0); 
-    purple = makeARGB (255, 255, 0, 255); 
 }
 
 void sendConfigItemToCluster (int itemId)
@@ -153,7 +162,7 @@ void repaint()
     updateTopologyShift();
     syncAllBlocks();
     
-    if (! getBlockIDOnPort(0))
+    if (! getBlockIDOnPort(0)) // if leftmost block light up key
     {
         if (getLocalConfig(2) == 1) //if MPE mode
         {
@@ -168,7 +177,7 @@ void repaint()
             fillPixel (yellow, 1, 0);
         }
     }
-    else
+    else //if not the leftmost block do not light up controll key
     {
         fillPixel (0, 0, 0);
         fillPixel (0, 1, 0);
@@ -182,6 +191,11 @@ void repaint()
 
 void touchStart (int index, float x, float y, float z, float vz)
 {
+    int xi = int (x * 100);
+    int yi = int (y * 100);
+    //log(xi);
+    //log(yi);
+    
     // Handle octave switches
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
         y >= octaveDownYloc && y <= octaveDownYloc + octaveSwitchYSize)
@@ -218,11 +232,8 @@ void touchStart (int index, float x, float y, float z, float vz)
         else setLocalConfig(4, getLocalConfig (4) + 1);
     }
     // Handle midi channel choosing
-    else if (getLocalConfig(64) == 1){       
-       int xi = int (x * 100);
-       int yi = int (y * 100);
-       log(xi);
-       log(yi);
+    else if (getLocalConfig(64) == 1) // if mode key is pressed
+    {       
        if (getLocalConfig(17)== 1)
        {
             if (x < C) setChannelMode(1);
@@ -237,11 +248,83 @@ void touchStart (int index, float x, float y, float z, float vz)
            if (x < CSharp) 
            {
                log(getLocalConfig(10));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    setLocalConfig(10, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(10, defaultVel);
+                }
+               
            }
-           else if (x >= CSharp && x < DSharp) log(2);
-           else if (x >= DSharp && x < FSharp) log(3);
-           else if (x >= FSharp && x < GSharp) log(4);
-           else if (x >= GSharp && x < ASharp) log(5);
+           else if (x >= CSharp && x < DSharp)
+           {
+               log(getLocalConfig(11));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    setLocalConfig(11, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(11, defaultLift);
+                }
+               
+           }
+           else if (x >= DSharp && x < FSharp)
+           {
+               log(getLocalConfig(12));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    setLocalConfig(12, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(12, defaultGlide);
+                }
+               
+           }
+           else if (x >= FSharp && x < GSharp)
+           {
+               log(getLocalConfig(13));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    setLocalConfig(13, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(13, defaultSlide);
+                }
+               
+           }
+           else if (x >= GSharp && x < ASharp){
+               log(getLocalConfig(14));
+               log(yi);
+               if (y > topRow)
+                {   
+                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                    log(value);
+                    //setLocalConfig(14, value);
+                }
+               else if (y >= 0.0 && y < topRow)
+                {
+                    setLocalConfig(14, defaultPress);
+                }
+               
+           }
+           syncAllBlocks();
        }
     }
     else
@@ -265,7 +348,7 @@ void handleMessage (int data0, int data1, int data2)
 void handleButtonDown (int index)
 {
     if (index == 0) {
-        // when mode button is pressed, enable "shift" globally
+        // when mode button is pressed, enable function layer globally
         setLocalConfig(64,1);
         sendConfigItemToCluster(64);
     }
