@@ -115,6 +115,7 @@ void initialise()
     clusterWidthLast = 1;
     updateTopologyShift();
     settingsRequested = false;
+    syncBlockToMaster();
 }
 
 void sendConfigItemToCluster (int itemId)
@@ -187,6 +188,10 @@ void touchStart (int index, float x, float y, float z, float vz)
     int yi = int (y * 100);
     //log(xi);
     //log(yi);
+    log(getBlockIdForBlockInCluster(0));
+    log(getBlockIdForBlockInCluster(1));
+
+    
     
     // Handle octave switches
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
@@ -403,6 +408,7 @@ void syncAllBlocks() {
     sendConfigItemToCluster (10);
     sendConfigItemToCluster (11);
     sendConfigItemToCluster (12);
+    sendConfigItemToCluster (13);
     sendConfigItemToCluster (14);
     sendConfigItemToCluster (15);
     sendConfigItemToCluster (16);
@@ -414,6 +420,7 @@ void syncAllBlocks() {
 }
 void syncBlockToMaster()
 {
+    int masterAddr;
     if (getClusterWidth() < 2)
         return;
     
@@ -427,10 +434,31 @@ void syncBlockToMaster()
         int port = getPortToMaster();
         if (port != 0xff)
         {
-            setLocalConfig( 0,int (requestRemoteConfig(getBlockIDOnPort(port), 0)));
+            masterAddr = getBlockIDOnPort(port);
         }
-
-        
+        else
+        {
+            masterAddr = getBlockIDForIndex(0);
+        }
+        setLocalConfig( 0,int (requestRemoteConfig(masterAddr, 0)));
+        setLocalConfig( 1,int (requestRemoteConfig(masterAddr, 1)));
+        setLocalConfig( 2,int (requestRemoteConfig(masterAddr, 2)));
+        setLocalConfig( 3,int (requestRemoteConfig(masterAddr, 3)));
+        setLocalConfig( 5,int (requestRemoteConfig(masterAddr, 5)));
+        setLocalConfig( 6,int (requestRemoteConfig(masterAddr, 6)));
+        setLocalConfig( 7,int (requestRemoteConfig(masterAddr, 7)));
+        setLocalConfig( 10,int (requestRemoteConfig(masterAddr, 10)));
+        setLocalConfig( 11,int (requestRemoteConfig(masterAddr, 11)));
+        setLocalConfig( 12,int (requestRemoteConfig(masterAddr, 12)));
+        setLocalConfig( 13,int (requestRemoteConfig(masterAddr, 13)));
+        setLocalConfig( 14,int (requestRemoteConfig(masterAddr, 14)));
+        setLocalConfig( 15,int (requestRemoteConfig(masterAddr, 15)));
+        setLocalConfig( 16,int (requestRemoteConfig(masterAddr, 16)));
+        setLocalConfig( 17,int (requestRemoteConfig(masterAddr, 17)));
+        setLocalConfig( 18,int (requestRemoteConfig(masterAddr, 18)));
+        setLocalConfig( 30,int (requestRemoteConfig(masterAddr, 30)));
+        setLocalConfig( 31,int (requestRemoteConfig(masterAddr, 31)));
+        setLocalConfig( 32,int (requestRemoteConfig(masterAddr, 32)));
     }
 }
 
