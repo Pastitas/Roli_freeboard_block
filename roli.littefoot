@@ -163,6 +163,7 @@ void updateTopologyShift ()
 void repaint()
 {
     updateTopologyShift();
+    syncBlockToMaster();
     clearDisplay();
     
     if (! getBlockIDOnPort(0)) // if leftmost block light up key
@@ -349,6 +350,7 @@ void handleButtonDown (int index)
         setLocalConfig(64,1);
         sendConfigItemToCluster(64);
         sendMIDI(0x7B);
+        sendMIDI(0x78);
     }
 }
 
