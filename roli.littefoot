@@ -243,85 +243,55 @@ void touchStart (int index, float x, float y, float z, float vz)
        {
            if (x < CSharp) 
            {
-               log(getLocalConfig(10));
-               log(yi);
                if (y > topRow)
                 {   
                     int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
                     setLocalConfig(10, value);
                 }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(10, defaultVel);
-                }
+               else if (y >= 0.0 && y < topRow) setLocalConfig(10, defaultVel);
+                
                
            }
            else if (x >= CSharp && x < DSharp)
            {
-               log(getLocalConfig(14));
-               log(yi);
                if (y > topRow)
                 {   
                     int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
                     setLocalConfig(14, value);
                 }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(14, defaultLift);
-                }
+               else if (y >= 0.0 && y < topRow) setLocalConfig(14, defaultLift);
                
            }
            else if (x >= DSharp && x < FSharp)
            {
-               log(getLocalConfig(11));
-               log(yi);
                if (y > topRow)
                 {   
                     int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
                     setLocalConfig(11, value);
                 }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(11, defaultGlide);
-                }
+               else if (y >= 0.0 && y < topRow) setLocalConfig(11, defaultGlide);
                
            }
            else if (x >= FSharp && x < GSharp)
            {
-               log(getLocalConfig(12));
-               log(yi);
                if (y > topRow)
                 {   
                     int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
                     setLocalConfig(12, value);
                 }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(12, defaultSlide);
-                }
-               
+               else if (y >= 0.0 && y < topRow) setLocalConfig(12, defaultSlide);
            }
            else if (x >= GSharp && x < ASharp){
-               log(getLocalConfig(13));
-               log(yi);
                if (y > topRow)
                 {   
                     int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
                     log(value);
                     setLocalConfig(13, value);
                 }
-               else if (y >= 0.0 && y < topRow)
-                {
-                    setLocalConfig(13, defaultPress);
-                }
-               
+               else if (y >= 0.0 && y < topRow) setLocalConfig(13, defaultPress); 
            }
-           syncAllBlocks();
        }
+       syncAllBlocks();
     }
     else
     {    
