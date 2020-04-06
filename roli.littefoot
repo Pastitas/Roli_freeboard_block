@@ -75,7 +75,7 @@ const int blue = 0xff0000ff;
 const int teal = 0xff00ffff;
 const int yellow = 0xffffff00;
 const int purple = 0xffff00ff;
-const int orange = 0xfffd6008;
+const int orange = 0xfffd3c00;
 
 //Default values for 5D
 
@@ -85,6 +85,8 @@ const int defaultLift = 127;
 const int defaultGlide = 120;
 const int defaultSlide = 62;
 const int defaultPress = 87;
+
+const int defaultAfterMode = 1;
 
 int  xPos;
 int  presetIndex;
@@ -186,7 +188,7 @@ void repaint()
             fillPixel(teal, 0, 0);
             fillPixel(teal, 1, 0); 
         }
-        else if (getLocalConfig(2) == (0 || 2)) // If normal mode show Yellow or orange if no piano mode
+        else if ((getLocalConfig(2) == 0) || (getLocalConfig(2) == 2)) // If normal mode show Yellow or orange if no piano mode
         {
             if (getLocalConfig(17) == 1)
             {
@@ -213,7 +215,7 @@ void touchStart (int index, float x, float y, float z, float vz)
     //log(getBlockIdForBlockInCluster(1));
     //log(getLocalConfig(9));
     //log(getLocalConfig(2));
-    //log(getLocalConfig(20));
+    //log(getLocalConfig(32));
     
     
     // Handle octave switches
@@ -268,7 +270,6 @@ void touchStart (int index, float x, float y, float z, float vz)
                 {
                     if (getLocalConfig(17) == 1) setLocalConfig(17,0);
                     else if (getLocalConfig(17) == 0) setLocalConfig(17,1);
-                    log(6969);
                 }
             }
             else if (x > CSharp && x < D)               
@@ -295,6 +296,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(7,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,7);
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,0);    // set poly aftertouch
             }
             else if (x > FSharp && x < G)               
             {
@@ -305,6 +307,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(9,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,9);
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,1);    // Aftertouch last played (default)
             }
             else if (x > GSharp && x < A)               
             {
@@ -315,6 +318,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(11,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,11);
+                else if (y > 0.0 && y < topRow)  setLocalConfig(32,4);   // Aftertouch disable
             }
             else if (x > ASharp && x < B)               
             {
@@ -372,7 +376,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             }
            else if (y >= 0.0 && y < topRow) setLocalConfig(13, defaultPress); 
         }       
-       syncAllBlocks();
+        syncAllBlocks();
     }
     else
     {    
