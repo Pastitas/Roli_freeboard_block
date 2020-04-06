@@ -23,7 +23,6 @@ and octave up enables MPE mode
  
 All changes in config sync between all blocks in the chain
 
-Toggle MPE mode and channel 1 with mode key
 Midi CC 80 on channel 1 sets midi channel. 0 = MPE
 Midi CC 81 on channel 1 sets Piano Mode. 0 = Piano mode off, 1 = on (and turns expression on/off as well)
 */
@@ -42,19 +41,33 @@ const float octaveSwitchYSize = 0.2;
 const float topRow = 0.39;
 const float botRow = 2.46;
 
-// upper X limits for key mapping THEY DO OVERLAP, SHARPS TO BE USED ONLY WITH EACH OTHER
-
-const float C = 0.38;
-const float CSharp = 0.59;
-const float D = 0.81;
-const float DSharp = 1.25;
-const float E = 1.25;
-const float F = 1.69;
-const float FSharp = 2.07;
-const float G = 2.12;
-const float GSharp = 2.39;
-const float A = 2.56;
-const float ASharp = 2.96;
+// upper X limits for key mapping ( this has been calculated taking 3 key presses (1c, 2c, 3c), averaging them and averaging that to the average of the next one 
+// (((1c + 2c + 3c)/3)+((1Csharp + 2Csharp + 3Csharp)/3))/2
+ 
+const float C       = 0.276;
+const float CSharp  = 0.497;
+const float D       = 0.714;
+const float DSharp  = 0.910;
+const float E       = 1.249;
+const float F       = 1.597;
+const float FSharp  = 1.823;
+const float G       = 2.040;
+const float GSharp  = 2.259;
+const float A       = 2.458;
+const float ASharp  = 2.665;
+const float B       = 3.011;
+const float C2      = 3.335;
+const float CSharp2 = 3.545;
+const float D2      = 3.779;
+const float DSharp2 = 3.997;
+const float E2      = 4.317;
+const float F2      = 4.654;
+const float FSharp2 = 4.857;
+const float G2      = 5.060;
+const float GSharp2 = 5.289;
+const float A2      = 5.506;
+const float ASharp2 = 5.722;
+const float B2      = 5.835;
 
 // Colours for mode button
 
@@ -62,6 +75,7 @@ const int blue = 0xff0000ff;
 const int teal = 0xff00ffff;
 const int yellow = 0xffffff00;
 const int purple = 0xffff00ff;
+const int orange = 0xfffd6008;
 
 //Default values for 5D
 
@@ -170,26 +184,37 @@ void repaint()
         if (getLocalConfig(2) == 1) //if MPE mode
         {
             fillPixel(teal, 0, 0);
-            fillPixel(teal, 1, 0);
+            fillPixel(teal, 1, 0); 
+        }
+        else if (getLocalConfig(2) == (0 || 2)) // If normal mode show Yellow or orange if no piano mode
+        {
+            if (getLocalConfig(17) == 1)
+            {
+                fillPixel(yellow, 0, 0);
+                fillPixel(yellow, 1, 0);
+            }
+            else if (getLocalConfig(17) == 0)
+            {
+                fillPixel(orange, 0, 0);
+                fillPixel(orange, 1, 0);
+            }
             
         }
-        else if (getLocalConfig(17)== 1) // If Piano mode show Yellow
-        {
-            fillPixel(yellow, 0, 0);
-            fillPixel(yellow, 1, 0);
-        }
     }
-    
 }
 
 void touchStart (int index, float x, float y, float z, float vz)
 {
-    int xi = int (x * 100);
-    int yi = int (y * 100);
+    //int xi = int (x * 1000);
+    //int yi = int (y * 1000);
     //log(xi);
     //log(yi);
     //log(getBlockIdForBlockInCluster(0));
     //log(getBlockIdForBlockInCluster(1));
+    //log(getLocalConfig(9));
+    //log(getLocalConfig(2));
+    //log(getLocalConfig(20));
+    
     
     // Handle octave switches
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
@@ -199,13 +224,12 @@ void touchStart (int index, float x, float y, float z, float vz)
         if (getLocalConfig(64) == 1)  
         {
             enablePianoMode(true);
-            setChannelMode(1);
+            setChannelMode(1,1);
         }
         else if (getClusterWidth() > 1 && getClusterXpos() != 0)
         {
             // if not the leftmost block, ignore the octave down key
-            handleTouchAsSeaboard (index);
-              
+            handleTouchAsSeaboard (index); 
         }
         else setLocalConfig(4, getLocalConfig (4) - 1);
     }
@@ -216,81 +240,138 @@ void touchStart (int index, float x, float y, float z, float vz)
         if (getLocalConfig(64) == 1)
         {
             enablePianoMode(false);
-            setChannelMode(0);
+            setChannelMode(0,0);
             syncAllBlocks();
         }
          else if (getClusterWidth() > 1 && getClusterXpos() < getNumBlocksInCurrentCluster() - 1)
         {
             // if not the rightmost block, ignore octave up key
             handleTouchAsSeaboard (index);
-              
         }
         else setLocalConfig(4, getLocalConfig (4) + 1);
     }
     // Handle midi channel choosing
     else if (getLocalConfig(64) == 1) // if mode key is pressed
     {       
-       if (getLocalConfig(17)== 1)
-       {
-            if (x < C) setChannelMode(1);
-            else if (x >= C && x < D) setChannelMode(2);
-            else if (x >= D && x < E) setChannelMode(3);
-            else if (x >= E && x < F) setChannelMode(4);
-            else if (x >= F && x < G) setChannelMode(5);
-            else if (x >= G && x < A) setChannelMode(6);
-       }
-       else if (getLocalConfig(2) == 1)
-       {
-           if (x < CSharp) 
-           {
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    setLocalConfig(10, value);
+        if (getLocalConfig(2)== 0)  // If mpe is off, choose midi
+        {
+            if (x < C)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(1,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,1);
+            }
+            else if (x > C && x < CSharp)           
+            {
+                if (y < botRow && y > topRow) setChannelMode(2,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,2);
+                else if (y > 0.0 && y < topRow)     // Piano mode button over Csharp
+                {
+                    if (getLocalConfig(17) == 1) setLocalConfig(17,0);
+                    else if (getLocalConfig(17) == 0) setLocalConfig(17,1);
+                    log(6969);
                 }
-               else if (y >= 0.0 && y < topRow) setLocalConfig(10, defaultVel);
-                
-               
-           }
-           else if (x >= CSharp && x < DSharp)
-           {
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    setLocalConfig(14, value);
-                }
-               else if (y >= 0.0 && y < topRow) setLocalConfig(14, defaultLift);
-               
-           }
-           else if (x >= DSharp && x < FSharp)
-           {
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    setLocalConfig(11, value);
-                }
-               else if (y >= 0.0 && y < topRow) setLocalConfig(11, defaultGlide);
-               
-           }
-           else if (x >= FSharp && x < GSharp)
-           {
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    setLocalConfig(12, value);
-                }
-               else if (y >= 0.0 && y < topRow) setLocalConfig(12, defaultSlide);
-           }
-           else if (x >= GSharp && x < ASharp){
-               if (y > topRow)
-                {   
-                    int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
-                    log(value);
-                    setLocalConfig(13, value);
-                }
-               else if (y >= 0.0 && y < topRow) setLocalConfig(13, defaultPress); 
-           }
-       }
+            }
+            else if (x > CSharp && x < D)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(3,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,3);
+            }
+            else if (x > D && x < DSharp)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(4,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,4);
+            }
+            else if (x > DSharp && x < E)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(5,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,5);
+            }
+            else if (x > E && x < F)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(6,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,6);
+            }
+            else if (x > F && x < FSharp)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(7,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,7);
+            }
+            else if (x > FSharp && x < G)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(8,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,8);
+            }
+            else if (x > G && x < GSharp)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(9,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,9);
+            }
+            else if (x > GSharp && x < A)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(10,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,10);
+            }
+            else if (x > A && x < ASharp)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(11,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,11);
+            }
+            else if (x > ASharp && x < B)               
+            {
+                if (y < botRow && y > topRow) setChannelMode(12,0);
+                else if (y < 30.0 && y > botRow) setChannelMode(0,12);
+            }
+        }
+        
+        //Here we use the secont octave for settings, defaults and some toggles
+        // The sharps are velocity, lift, glide, slide and press.
+        
+        
+        if (x > C2 && x < CSharp2)                                              // If "key"
+        {
+            if (y > topRow)                                                     //and not in top row
+            {   
+                int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));    //Get value in 0-127 range and absolute from y pos)
+                setLocalConfig(10, value);                                      // and set it to the setting (vel,lift,glide,slide or press)
+            }
+           else if (y >= 0.0 && y < topRow) setLocalConfig(10, defaultVel);     // if in top row reset to default set in variables up top
+        }
+        else if (x > D2 && x < DSharp2)
+        {
+           if (y > topRow)
+            {   
+                int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                setLocalConfig(14, value);
+            }
+           else if (y >= 0.0 && y < topRow) setLocalConfig(14, defaultLift);
+        }
+        else if (x > F2 && x < FSharp2)
+        {
+           if (y > topRow)
+            {   
+                int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                setLocalConfig(11, value);
+            }
+           else if (y >= 0.0 && y < topRow) setLocalConfig(11, defaultGlide);
+        }
+        else if (x > G2 && x < GSharp2)
+        {
+           if (y > topRow)
+            {   
+                int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                setLocalConfig(12, value);
+            }
+           else if (y >= 0.0 && y < topRow) setLocalConfig(12, defaultSlide);
+        }
+        else if (x > A2 && x < ASharp2){
+           if (y > topRow)
+            {   
+                int value = 127 - int (abs(map(y, 0.39, 3.0, 0.0 , 127.0)));
+                log(value);
+                setLocalConfig(13, value);
+            }
+           else if (y >= 0.0 && y < topRow) setLocalConfig(13, defaultPress); 
+        }       
        syncAllBlocks();
     }
     else
@@ -332,20 +413,20 @@ void handleButtonUp (int index)
     }
 }
 
-void setChannelMode(int midiChannel) {
+void setChannelMode(int midiChannel, int endChannel) 
+{
     
-    
-    if (midiChannel == 0) {
-        setLocalConfig(0, 2); // start channel
-        setLocalConfig(1, 16); // end channel
-        setLocalConfig(2, 1); // MPE on
-        
+    if (midiChannel == 0 && endChannel == 0)
+    {
+        setLocalConfig(0, 2);   // start channel
+        setLocalConfig(1, 16);  // end channel
+        setLocalConfig(2, 1);   // MPE on
     }
-    else if (midiChannel > 0 && midiChannel <= 16) {
-        setLocalConfig(0, midiChannel); // start channel
-        setLocalConfig(1, midiChannel); // end channel
-        setLocalConfig(2, 0); // MPE off
-
+    else if ((midiChannel > 0 && midiChannel <= 16) || (endChannel > 0 && endChannel <= 16))
+    {
+        if (midiChannel != 0) setLocalConfig(0, midiChannel);   // start channel
+        if (endChannel != 0) setLocalConfig(1, endChannel);     // if end channel set, set it
+        setLocalConfig(2, 0);                                   // MPE off
     }
     syncAllBlocks();
 }
@@ -358,17 +439,18 @@ void enablePianoMode(bool enable) {
         setLocalConfig(13, 0); // Pressure sensitivity
     }
     else {
-        setLocalConfig(17, 0); // Normal mode
-        setLocalConfig(11, 102); // Glide sensitivity
-        setLocalConfig(12, 127); // Slide sensitivity
-        setLocalConfig(13, 127); // Pressure sensitivity    
+        setLocalConfig(17, 0);              // MPE mode
+        setLocalConfig(11, defaultGlide);   // Glide sensitivity
+        setLocalConfig(12, defaultSlide);   // Slide sensitivity
+        setLocalConfig(13, defaultPress);   // Pressure sensitivity    
     }
     syncAllBlocks();
 }
 
 void syncAllBlocks() {
     
-    // Updates every value except octave and some not set
+    // Updates some values relevant
+    
     sendConfigItemToCluster (0);
     sendConfigItemToCluster (1);
     sendConfigItemToCluster (2);
@@ -439,7 +521,7 @@ void handleMIDI(int byte0, int byte1, int byte2) {
     int command = byte0 >> 4;
     if (channel == 1 && command == 11) { // 11 = midi CC command
         if (byte1 == 80) {
-            setChannelMode(byte2);
+            setChannelMode(byte2,byte2);
         }
         else if (byte1 == 81) {
             enablePianoMode(byte2 > 0 ? true : false);
