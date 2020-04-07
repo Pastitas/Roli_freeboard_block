@@ -196,6 +196,7 @@ void updateTopologyShift ()
         topOctaveShift = 0;
         setLocalConfig (8, topOctaveShift);
     }
+    if (getClusterWidth() == 1) setLocalConfigItemRange (4, -2, 4);
 }
 
 void repaint()
