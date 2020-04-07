@@ -9,8 +9,15 @@
 
 */
 /* DOCS
- Max X value(right): 58/10
- Max Z value(down): 30/10
+https://docs.juce.com/master/namespaceBlocksProtocol.html#ad54d15b68ca1356e84793a7c60c5b524a9f2dba367b1b285d34769e56819b4537
+https://docs.juce.com/blocks/the_littlefoot_language.html
+https://docs.juce.com/blocks/group__LittleFootFunctions.html#ga68c037539d2d64289162d5c5b68e5964
+
+pixel x0 y0 and x1 y0 is mode button pixels
+
+pressure modes (config 32) are 0 for poly aftertouch, 1 for last played, 2 highest,3 lowest, 4 disabled, 5 hardest
+ Max X value(right): 5.8/10
+ Max Z value(down): 3.0/10
  
  Config item max: 95, 64 and up are user values
  
@@ -86,7 +93,7 @@ const int defaultGlide = 120;
 const int defaultSlide = 62;
 const int defaultPress = 87;
 
-const int defaultAfterMode = 1;
+const int defaultAfterMode = 5;
 
 int  xPos;
 int  presetIndex;
@@ -222,15 +229,13 @@ void touchStart (int index, float x, float y, float z, float vz)
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
         y >= octaveDownYloc && y <= octaveDownYloc + octaveSwitchYSize)
     {
-        // If pressing mode button, octave down enables "normal" midi operation, channel set by key before letting go of shift
-        if (getLocalConfig(64) == 1)  
+        if (getLocalConfig(64) == 1)                                            // If pressing mode button, octave down enables "normal" midi operation
         {
             enablePianoMode(true);
             setChannelMode(1,1);
         }
-        else if (getClusterWidth() > 1 && getClusterXpos() != 0)
+        else if (getClusterWidth() > 1 && getClusterXpos() != 0)                // if not the leftmost block, ignore the octave down key
         {
-            // if not the leftmost block, ignore the octave down key
             handleTouchAsSeaboard (index); 
         }
         else setLocalConfig(4, getLocalConfig (4) - 1);
@@ -238,16 +243,14 @@ void touchStart (int index, float x, float y, float z, float vz)
     else if (x >= octaveUpXloc && x <= octaveUpXloc + octaveSwitchXSize && 
              y >= octaveUpYloc && y <= octaveUpYloc + octaveSwitchYSize)
     {
-        // octave up and mode button makes mpe mode
-        if (getLocalConfig(64) == 1)
+        if (getLocalConfig(64) == 1)                                            // octave up and mode button makes mpe mode
         {
             enablePianoMode(false);
             setChannelMode(0,0);
             syncAllBlocks();
         }
-         else if (getClusterWidth() > 1 && getClusterXpos() < getNumBlocksInCurrentCluster() - 1)
+         else if (getClusterWidth() > 1 && getClusterXpos() < getNumBlocksInCurrentCluster() - 1)  // if not the rightmost block, ignore octave up key
         {
-            // if not the rightmost block, ignore octave up key
             handleTouchAsSeaboard (index);
         }
         else setLocalConfig(4, getLocalConfig (4) + 1);
@@ -307,7 +310,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(9,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,9);
-                else if (y > 0.0 && y < topRow) setLocalConfig(32,1);    // Aftertouch last played (default)
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,defaultAfterMode);  // Aftertouch last played (default)
             }
             else if (x > GSharp && x < A)               
             {
@@ -378,9 +381,8 @@ void touchStart (int index, float x, float y, float z, float vz)
         }       
         syncAllBlocks();
     }
-    else
+    else                                                                        // All other touches are treated as seaboard playing
     {    
-        // All other touches are treated as seaboard playing
         handleTouchAsSeaboard (index);
     }
 }
@@ -398,9 +400,8 @@ void handleMessage (int data0, int data1, int data2)
 
 void handleButtonDown (int index)
 {
-    if (index == 0) {
-        // when mode button is pressed, enable function layer globally
-        setLocalConfig(64,1);
+    if (index == 0) {                                       
+        setLocalConfig(64,1);                               // when mode button is pressed, enable function layer globally using setting 64
         sendConfigItemToCluster(64);
         syncBlockToMaster();
         sendMIDI(0x7B);
