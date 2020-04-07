@@ -3,7 +3,7 @@
     <groups>
     </groups>
     <variables>
-        <variable name="draw"    type="bool"   value="true" />
+        <variable name="none"    type="bool"   value="true" />
     </variables>
 </metadata>
 
@@ -93,7 +93,7 @@ const int defaultGlide = 120;
 const int defaultSlide = 62;
 const int defaultPress = 87;
 
-const int defaultAfterMode = 5;
+const int defaultAfterMode = 5; // Hardest
 
 int  xPos;
 int  presetIndex;
@@ -129,10 +129,12 @@ void initialise()
 	setLocalConfigActiveState (32, true, true);
     setLocalConfigActiveState (64, true, false);
 	
-    setLocalConfigItemRange (4, -4, 6);
+    setLocalConfigItemRange (4, -2, 4);
     setLocalConfigItemRange (64, 0, 1);
-    
+
+    setLocalConfig(4, 1);                   //so one lonely block gets middle C
     setLocalConfig(64, 0);
+    setLocalConfig(32, defaultAfterMode);
     presetIndex = 0;
     topOctaveShift = 255;
     clusterWidthLast = 1;
@@ -160,6 +162,7 @@ void updateTopologyShift ()
 
         int octStart = ((getClusterWidth() - 1) / 2);    
         newTopOct = (getClusterXpos() - octStart) * 2;
+        if (getClusterWidth() == 2) setLocalConfigItemRange(4,-2,2); // if 2 blocks wide, only allow 2 octave up and down
         
         if (topOctaveShift != newTopOct)
         {
@@ -187,27 +190,13 @@ void repaint()
 {
     updateTopologyShift();
     clearDisplay();
-    
     if (! getBlockIDOnPort(0)) // if leftmost block light up key
     {
-        if (getLocalConfig(2) == 1) //if MPE mode
-        {
-            fillPixel(teal, 0, 0);
-            fillPixel(teal, 1, 0); 
-        }
+        if (getLocalConfig(2) == 1) clearDisplay(teal); //if MPE mode
         else if ((getLocalConfig(2) == 0) || (getLocalConfig(2) == 2)) // If normal mode show Yellow or orange if no piano mode
         {
-            if (getLocalConfig(17) == 1)
-            {
-                fillPixel(yellow, 0, 0);
-                fillPixel(yellow, 1, 0);
-            }
-            else if (getLocalConfig(17) == 0)
-            {
-                fillPixel(orange, 0, 0);
-                fillPixel(orange, 1, 0);
-            }
-            
+            if (getLocalConfig(17) == 1) clearDisplay(yellow);
+            else if (getLocalConfig(17) == 0) clearDisplay(orange);
         }
     }
 }
@@ -215,15 +204,11 @@ void repaint()
 void touchStart (int index, float x, float y, float z, float vz)
 {
     //int xi = int (x * 1000);
-    //int yi = int (y * 1000);
+    //int yi = int (y * 1000);                          //Random logging for debugging
     //log(xi);
     //log(yi);
     //log(getBlockIdForBlockInCluster(0));
-    //log(getBlockIdForBlockInCluster(1));
     //log(getLocalConfig(9));
-    //log(getLocalConfig(2));
-    //log(getLocalConfig(32));
-    
     
     // Handle octave switches
     if (x >= octaveDownXloc && x <= octaveDownXloc + octaveSwitchXSize && 
@@ -256,9 +241,9 @@ void touchStart (int index, float x, float y, float z, float vz)
         else setLocalConfig(4, getLocalConfig (4) + 1);
     }
     // Handle midi channel choosing
-    else if (getLocalConfig(64) == 1) // if mode key is pressed
+    else if (getLocalConfig(64) == 1)               // if mode key is pressed
     {       
-        if (getLocalConfig(2)== 0)  // If mpe is off, choose midi
+        if (getLocalConfig(2)== 0)              // If mpe is off, choose midi
         {
             if (x < C)               
             {
@@ -269,7 +254,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(2,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,2);
-                else if (y > 0.0 && y < topRow)     // Piano mode button over Csharp
+                else if (y > 0.0 && y < topRow)                             // Piano mode switch over Csharp
                 {
                     if (getLocalConfig(17) == 1) setLocalConfig(17,0);
                     else if (getLocalConfig(17) == 0) setLocalConfig(17,1);
@@ -310,7 +295,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(9,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,9);
-                else if (y > 0.0 && y < topRow) setLocalConfig(32,defaultAfterMode);  // Aftertouch last played (default)
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,defaultAfterMode);  // Aftertouch default
             }
             else if (x > GSharp && x < A)               
             {
