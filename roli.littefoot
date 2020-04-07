@@ -16,12 +16,17 @@ https://docs.juce.com/blocks/group__LittleFootFunctions.html#ga68c037539d2d64289
 pixel x0 y0 and x1 y0 is mode button pixels
 
 pressure modes (config 32) are 0 for poly aftertouch, 1 for last played, 2 highest,3 lowest, 4 disabled, 5 hardest
- Max X value(right): 5.8/10
- Max Z value(down): 3.0/10
+
+Max X value(right): 5.8/10
+Max Z value(down): 3.0/10
+
+Config item max: 95, 64 and up are user values
  
- Config item max: 95, 64 and up are user values
- 
- config 64 used as function layer (mode button pressed) indicator
+config 64 used as function layer (mode button pressed) indicator
+
+
+00NT: 701795
+9S11: 714086
  
 
 /*
@@ -135,6 +140,13 @@ void initialise()
     setLocalConfig(4, 1);                   //so one lonely block gets middle C
     setLocalConfig(64, 0);
     setLocalConfig(32, defaultAfterMode);
+    
+    setLocalConfig(10, defaultVel);
+    setLocalConfig(14, defaultLift);
+    setLocalConfig(11, defaultGlide);
+    setLocalConfig(12, defaultSlide);
+    setLocalConfig(13, defaultPress);
+    
     presetIndex = 0;
     topOctaveShift = 255;
     clusterWidthLast = 1;
@@ -195,8 +207,11 @@ void repaint()
         if (getLocalConfig(2) == 1) clearDisplay(teal); //if MPE mode
         else if ((getLocalConfig(2) == 0) || (getLocalConfig(2) == 2)) // If normal mode show Yellow or orange if no piano mode
         {
-            if (getLocalConfig(17) == 1) clearDisplay(yellow);
-            else if (getLocalConfig(17) == 0) clearDisplay(orange);
+            clearDisplay(yellow);
+            if (getLocalConfig(17) == 1) fillPixel(yellow,1,0);
+            if (getLocalConfig(17) == 0) fillPixel(orange,1,0);
+            if (getLocalConfig(15) == 1) fillPixel(purple,0,0);
+            
         }
     }
 }
@@ -269,6 +284,11 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(4,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,4);
+                 else if (y > 0.0 && y < topRow)                             // Fixed velocity switch over Csharp
+                {
+                    if (getLocalConfig(15) == 1) setLocalConfig(15,0);
+                    else if (getLocalConfig(15) == 0) setLocalConfig(15,1);
+                }
             }
             else if (x > DSharp && x < E)               
             {
@@ -427,6 +447,7 @@ void enablePianoMode(bool enable) {
         setLocalConfig(11, 0); // Glide sensitivity
         setLocalConfig(12, 0); // Slide sensitivity
         setLocalConfig(13, 0); // Pressure sensitivity
+        setLocalConfig(15, 0); // fixed velocity off
     }
     else {
         setLocalConfig(17, 0);              // MPE mode
