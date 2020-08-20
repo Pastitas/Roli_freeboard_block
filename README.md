@@ -15,6 +15,8 @@ Basicly I made the mode switch and LED into a kind of a shift key, that enables:
 - Activating Piano mode
 - Setting different sensitivities to each of the mpe dimensions
 - Setting midi channels
+- Uses octave up and down switches for modesetting (when shift is pressed).
+- Deactivates octave up and down switches except for the ones on the "outside", for when you join multiple keyboards.
 
 All this is done by using mode button + another key in the keyboard 
 
@@ -23,7 +25,7 @@ All this is done by using mode button + another key in the keyboard
 ## Installation instructions
 **PROPER INSTALL INSTRUCTIONS COMING**
 OF COURSE IF YOU BREAK YOUR DEVICE I AM NOT RESPONSIBLE, do it at your own risk, however this is not hacking anything and should something happen it should be within the warranty (DIDN'T LOOK IT UP, YOU DO YOU).
-But basicly you need to download the [IDE](https://juce.com/blocks/code)paste the script and flash it to the device after connecting it
+But basicly you need to download the [IDE](https://juce.com/blocks/code), paste the script and flash it to the device after connecting it.
 
 ### References
 - IDE https://juce.com/blocks/code
