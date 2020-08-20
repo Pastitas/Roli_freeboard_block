@@ -13,7 +13,9 @@ All this is done by using mode button + another key in the keyboard
 **OVERLAY COMING**
 
 **INSTALL INSTRUCTIONS COMING**
+But basicly you need to download the [IDE](https://juce.com/blocks/code)paste the script and flash it to the device after connecting it
 
 ### References
+- IDE https://juce.com/blocks/code
 - https://docs.juce.com/blocks/group__LittleFootFunctions.html#ga70967dcba6beea8a66f216f75619ff35 
 - https://docs.juce.com/master/group__LittleFootFunctions.html
