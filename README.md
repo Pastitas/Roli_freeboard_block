@@ -24,7 +24,10 @@ All this is done by using mode button + another key in the keyboard
 
 ## Installation instructions
 **PROPER INSTALL INSTRUCTIONS COMING**
+
 OF COURSE IF YOU BREAK YOUR DEVICE I AM NOT RESPONSIBLE, do it at your own risk, however this is not hacking anything and should something happen it should be within the warranty (DIDN'T LOOK IT UP, YOU DO YOU).
+
+
 But basicly you need to download the [IDE](https://juce.com/blocks/code), paste the script and flash it to the device after connecting it.
 
 ### References
