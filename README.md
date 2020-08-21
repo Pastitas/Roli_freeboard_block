@@ -20,6 +20,7 @@ Basicly I made the mode switch and LED into a kind of a shift key, that enables:
 
 All this is done by using mode button + another key in the keyboard 
 
+## Usage
 **OVERLAY COMING**
 
 If pressing mode button, octave down enables "normal" midi operation, and octave up enables MPE mode
