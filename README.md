@@ -22,6 +22,25 @@ All this is done by using mode button + another key in the keyboard
 
 **OVERLAY COMING**
 
+If pressing mode button, octave down enables "normal" midi operation, and octave up enables MPE mode
+
+Mode light colour:
+  * Teal -> If MPE mode
+  * yellow -> normal mode
+  * orange -> piano mode off
+
+If not the leftmost block, ignore the octave down key and if not the rightmost block, ignore octave up key (this only applies for multiple blocks together).
+
+Oher settings that can be accesed with Mode button:
+  * Piano mode switch over Csharp
+  * Fixed velocity switch over Dsharp
+  * set poly aftertouch over Fsharp
+  * Aftertouch default over Gsharp
+  * Aftertouch disable over Asharp
+  * The second octave is used for settings, defaults and some toggles. the sharps are velocity, lift, glide, slide and press "sliders", and reset to default when pressed over the top row over the keys
+
+All changes in config sync between all blocks in the chain
+
 ## Installation instructions
 **PROPER INSTALL INSTRUCTIONS COMING**
 
