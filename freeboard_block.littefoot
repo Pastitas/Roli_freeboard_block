@@ -285,7 +285,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(4,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,4);
-                 else if (y > 0.0 && y < topRow)                             // Fixed velocity switch over Csharp
+                 else if (y > 0.0 && y < topRow)                             // Fixed velocity switch over Dsharp
                 {
                     if (getLocalConfig(15) == 1) setLocalConfig(15,0);
                     else if (getLocalConfig(15) == 0) setLocalConfig(15,1);
@@ -305,7 +305,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(7,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,7);
-                else if (y > 0.0 && y < topRow) setLocalConfig(32,0);    // set poly aftertouch
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,0);    // set poly aftertouch over Fsharp
             }
             else if (x > FSharp && x < G)               
             {
@@ -316,7 +316,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(9,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,9);
-                else if (y > 0.0 && y < topRow) setLocalConfig(32,defaultAfterMode);  // Aftertouch default
+                else if (y > 0.0 && y < topRow) setLocalConfig(32,defaultAfterMode);  // Aftertouch default over Gsharp
             }
             else if (x > GSharp && x < A)               
             {
@@ -327,7 +327,7 @@ void touchStart (int index, float x, float y, float z, float vz)
             {
                 if (y < botRow && y > topRow) setChannelMode(11,0);
                 else if (y < 30.0 && y > botRow) setChannelMode(0,11);
-                else if (y > 0.0 && y < topRow)  setLocalConfig(32,4);   // Aftertouch disable
+                else if (y > 0.0 && y < topRow)  setLocalConfig(32,4);   // Aftertouch disable over Asharp
             }
             else if (x > ASharp && x < B)               
             {
