@@ -32,12 +32,15 @@ Mode light colour:
 
 If not the leftmost block, ignore the octave down key and if not the rightmost block, ignore octave up key (this only applies for multiple blocks together).
 
+There are 3 zones considered, Top row *top flat row over the keys*, bottom row *same, but at the bottom* and the keys themselves.
+
 Oher settings that can be accesed with Mode button:
-  * Piano mode switch over Csharp
-  * Fixed velocity switch over Dsharp
-  * set poly aftertouch over Fsharp
-  * Aftertouch default over Gsharp
-  * Aftertouch disable over Asharp
+  * First octave keys: Midi start channel in the key itself, end channel in the bottom row of each key. (C is 1, c# is 2.... until b).
+  * Piano mode switch top row Csharp
+  * Fixed velocity switch top rpw Dsharp
+  * set poly aftertouch top row Fsharp
+  * Aftertouch default top row Gsharp
+  * Aftertouch disable top row Asharp
   * The second octave is used for settings, defaults and some toggles. the sharps are velocity, lift, glide, slide and press "sliders", and reset to default when pressed over the top row over the keys
 
 All changes in config sync between all blocks in the chain
