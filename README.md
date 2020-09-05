@@ -32,7 +32,7 @@ Mode light colour:
 
 If not the leftmost block, ignore the octave down key and if not the rightmost block, ignore octave up key (this only applies for multiple blocks together).
 
-There are 3 zones considered, Top row *top flat row over the keys*, bottom row *same, but at the bottom* and the keys themselves.
+There are 3 zones considered, Top row (top flat row over the keys), bottom row (same, but at the bottom) and the keys themselves.
 
 Oher settings that can be accesed with Mode button:
   * First octave keys: Midi start channel in the key itself, end channel in the bottom row of each key. (C is 1, c# is 2.... until b).
