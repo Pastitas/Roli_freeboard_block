@@ -53,6 +53,11 @@ OF COURSE IF YOU BREAK YOUR DEVICE I AM NOT RESPONSIBLE, do it at your own risk,
 
 But basicly you need to download the [IDE](https://juce.com/blocks/code), paste the script and flash it to the device after connecting it.
 
+### Possible new install method
+https://github.com/agraef/myblocks
+I haven't tested this one out yet but if I'm free from roli's ecosystem I might
+
+
 ### References
 - IDE https://juce.com/blocks/code
 - https://docs.juce.com/blocks/group__LittleFootFunctions.html#ga70967dcba6beea8a66f216f75619ff35 
